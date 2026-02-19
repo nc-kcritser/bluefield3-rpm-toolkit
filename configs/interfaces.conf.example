@@ -1,0 +1,165 @@
+# Network Configuration Example for Spectrum-X 8-Rail Deployment
+# 
+# This file documents the network configuration created by
+# bluefield-configure-ips.sh
+#
+# Do not use this file directly - it is for reference only.
+# Use the bluefield-configure-ips.sh script to configure networking.
+
+# =============================================================================
+# IP Addressing Scheme
+# =============================================================================
+#
+# Each BlueField interface connects to a dedicated rail with isolated routing:
+#
+# Rail  Interface    IP Address       Gateway         Table  Leaf/VLAN
+# ----  -----------  ---------------  --------------  -----  ------------
+#   1   ens32f0np0   192.168.1.X/24   192.168.1.254   101    Leaf 1 VLAN 1
+#   2   ens33f0np0   192.168.2.X/24   192.168.2.254   102    Leaf 1 VLAN 2
+#   3   ens34f0np0   192.168.3.X/24   192.168.3.254   103    Leaf 1 VLAN 3
+#   4   ens35f0np0   192.168.4.X/24   192.168.4.254   104    Leaf 1 VLAN 4
+#   5   ens36f0np0   192.168.5.X/24   192.168.5.254   105    Leaf 2 VLAN 5
+#   6   ens37f0np0   192.168.6.X/24   192.168.6.254   106    Leaf 2 VLAN 6
+#   7   ens38f0np0   192.168.7.X/24   192.168.7.254   107    Leaf 2 VLAN 7
+#   8   ens39f0np0   192.168.8.X/24   192.168.8.254   108    Leaf 2 VLAN 8
+#
+# Where X is the host ID (e.g., 4 for host .4)
+
+# =============================================================================
+# Example: Host ID 4
+# =============================================================================
+
+# Rail 1 Configuration
+Connection name: rail1
+Interface: ens32f0np0
+IP Address: 192.168.1.4/24
+Gateway: 192.168.1.254
+MTU: 9216
+Routing Table: 101
+Policy Rule: priority 100 from 192.168.1.4 table 101
+Limiter Route: 192.168.0.0/20 via 192.168.1.254 table 101
+
+# Rail 2 Configuration
+Connection name: rail2
+Interface: ens33f0np0
+IP Address: 192.168.2.4/24
+Gateway: 192.168.2.254
+MTU: 9216
+Routing Table: 102
+Policy Rule: priority 100 from 192.168.2.4 table 102
+Limiter Route: 192.168.0.0/20 via 192.168.2.254 table 102
+
+# ... and so on for rails 3-8 ...
+
+# =============================================================================
+# Routing Tables
+# =============================================================================
+#
+# Each rail has its own routing table to ensure traffic isolation:
+#
+# Table 101 (Rail 1):
+#   192.168.0.0/20 via 192.168.1.254 dev ens32f0np0
+#   192.168.1.0/24 dev ens32f0np0 proto kernel scope link src 192.168.1.4
+#
+# Table 102 (Rail 2):
+#   192.168.0.0/20 via 192.168.2.254 dev ens33f0np0
+#   192.168.2.0/24 dev ens33f0np0 proto kernel scope link src 192.168.2.4
+#
+# etc...
+
+# =============================================================================
+# Policy-Based Routing Rules
+# =============================================================================
+#
+# Source-based routing ensures return traffic exits the correct interface:
+#
+# 100:  from 192.168.1.4 lookup 101
+# 100:  from 192.168.2.4 lookup 102
+# 100:  from 192.168.3.4 lookup 103
+# 100:  from 192.168.4.4 lookup 104
+# 100:  from 192.168.5.4 lookup 105
+# 100:  from 192.168.6.4 lookup 106
+# 100:  from 192.168.7.4 lookup 107
+# 100:  from 192.168.8.4 lookup 108
+
+# =============================================================================
+# Verification Commands
+# =============================================================================
+
+# View all connections
+$ nmcli con show
+
+# View specific connection
+$ nmcli con show rail1
+
+# View IP addresses
+$ ip addr show | grep 192.168
+
+# View routing table for rail 1
+$ ip route show table 101
+
+# View all routing rules
+$ ip rule show | grep 192.168
+
+# Test connectivity on rail 1
+$ ping -I rail1 -c 3 192.168.1.254
+
+# =============================================================================
+# Customization
+# =============================================================================
+#
+# To use a different IP range (e.g., 10.100.x.x):
+#
+# 1. Edit bluefield-configure-ips.sh
+# 2. Change BASE_IP="192.168" to BASE_IP="10.100"
+# 3. Change LIMITER_ROUTE to match (e.g., "10.100.0.0/20")
+# 4. Run the script: sudo ./bluefield-configure-ips.sh 4
+#
+# To use a different gateway octet (e.g., .1 instead of .254):
+#
+# 1. Edit bluefield-configure-ips.sh
+# 2. Change GATEWAY_OCTET="254" to GATEWAY_OCTET="1"
+# 3. Run the script: sudo ./bluefield-configure-ips.sh 4
+
+# =============================================================================
+# Switch Configuration Requirements
+# =============================================================================
+#
+# For this configuration to work, switches must be configured with:
+#
+# 1. 8 VLANs (VLANs 1-8)
+# 2. Each VLAN has a gateway at .254 (or your configured octet)
+# 3. MTU 9216 (jumbo frames) enabled on all switch ports
+# 4. Flow control / PFC configured for RoCE
+# 5. DSCP trust mode for QoS
+#
+# Example switch gateway IPs:
+#   VLAN 1: 192.168.1.254
+#   VLAN 2: 192.168.2.254
+#   VLAN 3: 192.168.3.254
+#   VLAN 4: 192.168.4.254
+#   VLAN 5: 192.168.5.254
+#   VLAN 6: 192.168.6.254
+#   VLAN 7: 192.168.7.254
+#   VLAN 8: 192.168.8.254
+
+# =============================================================================
+# Troubleshooting
+# =============================================================================
+#
+# Interface not getting IP:
+#   sudo nmcli con up rail1
+#   sudo journalctl -xe | grep NetworkManager
+#
+# Can't ping gateway:
+#   ip route show table 101
+#   ip rule show | grep 192.168.1.4
+#   Check cable and switch configuration
+#
+# Wrong interface used for traffic:
+#   Check policy routing rules: ip rule show
+#   Verify source IP matches: ip addr show
+#
+# MTU issues:
+#   ip link show ens32f0np0 | grep mtu
+#   Should show mtu 9216

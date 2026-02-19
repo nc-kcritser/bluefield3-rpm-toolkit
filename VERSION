@@ -1,0 +1,54 @@
+BlueField-3 SuperNIC Management Toolkit
+Version: 1.0.0
+Release Date: 2024-02-18
+
+Components:
+- bluefield-status.sh v1.0.0
+- bluefield-rshim-check.sh v1.0.0
+- bluefield-configure-ips.sh v1.0.0
+- setup-spectrum-x-rhel.sh v1.0.0
+- bluefield-quick-check.sh v1.0.0
+
+Supported Hardware:
+- NVIDIA BlueField-3 B3140H E-series SuperNICs
+- Dell PowerEdge servers (tested)
+- Other x86 servers with PCIe Gen4/Gen5 x16 slots
+
+Supported Operating Systems:
+- RHEL 8.x (tested on 8.9)
+- RHEL 9.x (tested on 9.3)
+- Rocky Linux 8.x
+- Rocky Linux 9.x (tested on 9.3)
+- Alma Linux 8.x
+- Alma Linux 9.x
+
+Tested Firmware:
+- DOCA 3.2.1 LTS (bf-fwbundle-3.2.1-34_25.11-prod.bfb)
+
+Requirements:
+- Mellanox Software Tools (MST) or DOCA-Host package
+- rshim package
+- NetworkManager
+- Root/sudo access
+
+Change Log:
+
+v1.0.0 (2024-02-18):
+- Initial release
+- Comprehensive status checking
+- RShim management with auto-fix
+- Spectrum-X RoCE acceleration configuration
+- 8-rail network configuration with policy-based routing
+- Complete documentation suite
+- Troubleshooting guide
+- Configuration examples
+
+Known Issues:
+- None at this time
+
+Future Enhancements:
+- Web-based monitoring dashboard
+- Automated firmware update workflow
+- Integration with configuration management tools (Ansible, Puppet)
+- Support for Ubuntu/Debian distributions
+- Performance monitoring and alerting

@@ -1,0 +1,51 @@
+# RShim Configuration for BlueField-3 SuperNICs
+# Location: /etc/rshim.conf
+#
+# This is an example configuration file.
+# Copy to /etc/rshim.conf and modify as needed.
+
+# CRITICAL: For systems with multiple BlueField cards (8 in this deployment),
+# FORCE_MODE must be enabled. Without this, only 3-5 rshim devices will appear.
+#
+# FORCE_MODE sends ownership requests to claim rshim devices from other backends.
+# This is required for the rshim driver to take control of all cards.
+FORCE_MODE     1
+
+# Backend selection (optional)
+# Leave commented to use default (auto-detect)
+# Options: pcie, usb, pcie_lf
+#BACKEND        pcie
+
+# Device filtering (optional)
+# Uncomment to restrict to specific PCIe addresses
+# Example: Only manage cards at specific PCIe locations
+#DEVICE_FILTER  0000:17:00.1,0000:65:00.1,0000:b3:00.1
+
+# Log level (optional)
+# Options: 0=ERROR, 1=WARNING, 2=INFO, 3=DEBUG
+# Default: 2 (INFO)
+#LOG_LEVEL      2
+
+# Timeout for device initialization (optional)
+# In seconds. Default: 30
+#INIT_TIMEOUT   30
+
+# === Notes for BlueField-3 Deployment ===
+#
+# 1. FORCE_MODE=1 is REQUIRED for 8-card deployments
+#
+# 2. After changing this file, restart rshim service:
+#    sudo systemctl restart rshim.service
+#
+# 3. Verify all 8 devices appear:
+#    ls /dev/rshim*
+#    Should show: rshim0 through rshim7
+#
+# 4. If devices don't appear:
+#    - Check card firmware: INTERNAL_CPU_RSHIM must be ENABLED(0)
+#    - Check service logs: sudo journalctl -u rshim.service
+#    - Run diagnostic: sudo ./scripts/bluefield-rshim-check.sh
+#
+# 5. Troubleshooting:
+#    sudo journalctl -u rshim.service -n 50
+#    sudo dmesg | grep rshim
