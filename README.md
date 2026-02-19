@@ -199,7 +199,9 @@ Most scripts require root/sudo access for:
 ## Configuration Files
 
 ### /etc/rshim.conf
-**Critical setting for multiple cards:**
+**Critical setting for multiple cards:** 
+This sometimes occurs when you don't see all the rshim devices associated with the devices.
+It was observed in RHEL 8, that **uio_pci_generic** was grabbing the rshim devices first, and then doesn't present all the devices.
 ```
 FORCE_MODE     1
 ```
