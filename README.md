@@ -233,7 +233,7 @@ IFACES=(
 # 1. Check current state
 ./scripts/bluefield-status.sh > initial-status.txt
 
-# 2. Fix RShim access
+# 2. Fix RShim access (--fix-rshim will make the actual change, otherwise it will dry-run)
 sudo ./scripts/bluefield-rshim-check.sh --fix-rshim
 
 # 3. Update firmware (if needed)
@@ -368,7 +368,7 @@ sudo journalctl -u spectrum-x-roce.service       # View logs
 ✓ RShim Devices: 8 present
 ✓ RDMA Devices: 9 active (8 BlueField + 1 other)
 ✓ Spectrum-X Accelerations: Enabled on all cards
-✓ Network Interfaces: 7/8 UP
+✓ Network Interfaces: 8/8 UP
 Status: HEALTHY
 ```
 
@@ -416,21 +416,12 @@ Contributions welcome! Areas for improvement:
 - ✅ RHEL/Rocky/Alma Linux support
 
 **Tested On**:
-- Rocky Linux 9.3
-- RHEL 8.9
+- RHEL 8.10
 - DOCA 3.2.1 LTS firmware
 
 **Hardware Tested**:
 - Dell PowerEdge servers
-- 8x BlueField-3 B3140H (900-9D3D4-00EN-HA0_Ax)
-
-## License
-
-[Specify your license - e.g., MIT, Apache 2.0, GPL, Proprietary]
-
-## Authors
-
-[Your organization/team name]
+- 8x BlueField-3 B3140H SuperNIC Mode (900-9D3D4-00EN-HA0_Ax)
 
 ## Acknowledgments
 
