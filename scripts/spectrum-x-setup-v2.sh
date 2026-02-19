@@ -2,9 +2,8 @@
 set -euo pipefail
 
 # =============================================================================
-# Spectrum-X RoCE Configuration Installer
+# Spectrum-X RoCE Configuration Installer - Full Setup Script / Systemd method
 # RHEL/Rocky Linux — BlueField-3 / Spectrum-X
-# Standalone systemd service method
 # =============================================================================
 
 # --- Define your interface list here -----------------------------------------
@@ -20,7 +19,7 @@ echo ""
 # PART 1 — Write the configuration script
 # =============================================================================
 echo "Creating configuration script..."
-sudo tee /usr/local/sbin/configure-spectrum-x-rhel.sh > /dev/null << EOF
+sudo tee /usr/local/bin/configure-spectrum-x-rhel.sh > /dev/null << EOF
 #!/bin/bash
 set -euo pipefail
 
@@ -163,7 +162,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/configure-spectrum-x-rhel.sh
+ExecStart=/usr/local/bin/configure-spectrum-x-rhel.sh
 RemainAfterExit=yes
 
 [Install]
@@ -189,7 +188,7 @@ echo ""
 echo "=== Installation Complete ==="
 echo ""
 echo "Files written:"
-echo "  /usr/local/sbin/configure-spectrum-x-rhel.sh  — configuration script"
+echo "  /usr/local/bin/configure-spectrum-x-rhel.sh  — configuration script"
 echo "  /etc/systemd/system/spectrum-x.service         — systemd service unit"
 echo ""
 echo "Interfaces configured:"
